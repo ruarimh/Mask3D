@@ -27,7 +27,6 @@ GitPython==3.1.27
 google-auth==2.11.0
 google-auth-oauthlib==0.4.6
 grpcio==1.47.0
-hydra-core==1.0.5
 idna==3.3
 imageio==2.21.1
 importlib-metadata==3.10.1
@@ -45,7 +44,6 @@ networkx==2.8.6
 ninja==1.10.2.3
 numpy==1.23.2
 oauthlib==3.2.0
-omegaconf==2.0.6
 opencv-python-headless==4.6.0.66
 packaging==21.3
 pathspec==0.9.0
