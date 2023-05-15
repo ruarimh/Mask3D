@@ -53,7 +53,7 @@ general:
 
 defaults:
   - data: indoor
-  - data/data_loaders: simple_loader
+  - data/data_loaders: simple_loader_save_memory
   - data/datasets: scannet
   - data/collation_functions: voxelize_collate
   - logging: full
