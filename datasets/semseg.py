@@ -85,6 +85,7 @@ class SemanticSegmentationDataset(Dataset):
         if self.dataset_name == "scannet":
             self.color_map = SCANNET_COLOR_MAP_20
             self.color_map[255] = (255, 255, 255)
+            
         elif self.dataset_name == "stpls3d":
             self.color_map = {
                 0:[0, 255, 0],  # Ground
@@ -102,6 +103,10 @@ class SemanticSegmentationDataset(Dataset):
                 12:[50, 50, 50],  # StreetSign
                 13:[60, 130, 60],  # Clutter
                 14:[130, 30, 60]}  # Fence
+        elif self.dataset_name == "las":
+            self.color_map = [
+                [0, 255, 0],   # Other
+                [0, 0, 255]]   # Trees
         elif self.dataset_name == "scannet200":
             self.color_map = SCANNET_COLOR_MAP_200
         elif self.dataset_name == "s3dis":
@@ -339,7 +344,7 @@ class SemanticSegmentationDataset(Dataset):
             assert not self.on_crops, "you need caching if on crops"
             points = np.load(self.data[idx]["filepath"].replace("../../", ""))
 
-        if "train" in self.mode and self.dataset_name in ["s3dis", "stpls3d"]:
+        if "train" in self.mode and self.dataset_name in ["s3dis", "stpls3d", "las"]:
             inds = self.random_cuboid(points)
             points = points[inds]
 
@@ -545,7 +550,8 @@ class SemanticSegmentationDataset(Dataset):
         if self.dataset_name == "s3dis":
             return coordinates, features, labels, self.data[idx]['area'] + "_" + self.data[idx]['scene'],\
                    raw_color, raw_normals, raw_coordinates, idx
-        if self.dataset_name == "stpls3d":
+                   
+        if self.dataset_name in ["stpls3d", "las"]:
             if labels.shape[1] != 1: # only segments --> test set!
                 if np.unique(labels[:, -2]).shape[0] < 2:
                     print("NO INSTANCES")
