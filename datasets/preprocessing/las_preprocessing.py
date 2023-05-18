@@ -204,7 +204,7 @@ class LASPreprocessing(BasePreprocessing):
         return filebase
 
     def compute_color_mean_std(
-            self, train_database_path: str = "./data/processed/stpls3d/train_database.yaml"
+            self, train_database_path: str = "./data/processed/las/train_database.yaml"
     ):
         train_database = self._load_yaml(train_database_path)
         color_mean, color_std = [], []
