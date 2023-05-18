@@ -673,6 +673,21 @@ class InstanceSegmentation(pl.LightningModule):
                         file_name,
                         self.decoder_id
                     )
+                    
+                elif self.validation_dataset.dataset_name == "las":
+                    scan_id, _, crop_id = file_names[bid].split("_")
+                    scan_id = crop_id.replace("plot", "")
+                    crop_id = int(crop_id.replace(".npy", ""))
+                    file_name = f"{scan_id}_points_GTv3_0{crop_id}_inst_nostuff"
+
+                    self.export(
+                        self.preds[file_names[bid]]['pred_masks'],
+                        self.preds[file_names[bid]]['pred_scores'],
+                        self.preds[file_names[bid]]['pred_classes'],
+                        file_name,
+                        self.decoder_id
+                    )
+                    
                 else:
                     self.export(
                         self.preds[file_names[bid]]['pred_masks'],
@@ -708,7 +723,7 @@ class InstanceSegmentation(pl.LightningModule):
         root_path = f"eval_output"
         base_path = f"{root_path}/instance_evaluation_{self.config.general.experiment_name}_{self.current_epoch}"
 
-        if self.validation_dataset.dataset_name in ["scannet", "stpls3d", "scannet200"]:
+        if self.validation_dataset.dataset_name in ["scannet", "stpls3d", "scannet200", "las"]:
             gt_data_path = f"{self.validation_dataset.data_dir[0]}/instance_gt/{self.validation_dataset.mode}"
         else:
             gt_data_path = f"{self.validation_dataset.data_dir[0]}/instance_gt/Area_{self.config.general.area}"
@@ -732,7 +747,8 @@ class InstanceSegmentation(pl.LightningModule):
                 mprec, mrec = evaluate(new_preds, gt_data_path, pred_path, dataset="s3dis")
                 ap_results[f"{log_prefix}_mean_precision"] = mprec
                 ap_results[f"{log_prefix}_mean_recall"] = mrec
-            elif self.validation_dataset.dataset_name == "stpls3d":
+            
+            elif self.validation_dataset.dataset_name in ["stpls3d"]:
                 new_preds = {}
                 for key in self.preds.keys():
                     new_preds[key.replace(".txt", "")] = {
@@ -741,7 +757,19 @@ class InstanceSegmentation(pl.LightningModule):
                         'pred_scores': self.preds[key]['pred_scores']
                     }
 
-                evaluate(new_preds, gt_data_path, pred_path, dataset="stpls3d")
+                evaluate(new_preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name)
+                
+            elif self.validation_dataset.dataset_name in ["las"]:
+                new_preds = {}
+                for key in self.preds.keys():
+                    new_preds[key.replace(".las", "")] = {
+                        'pred_classes': self.preds[key]['pred_classes'],
+                        'pred_masks': self.preds[key]['pred_masks'],
+                        'pred_scores': self.preds[key]['pred_scores']
+                    }
+
+                evaluate(new_preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name)
+                
             else:
                 evaluate(self.preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name)
             with open(pred_path, "r") as fin:
