@@ -5,58 +5,34 @@ from fire import Fire
 from natsort import natsorted
 from loguru import logger
 import pandas as pd
+import laspy
 
 from datasets.preprocessing.base_preprocessing import BasePreprocessing
 
-class STPLS3DPreprocessing(BasePreprocessing):
+class LASPreprocessing(BasePreprocessing):
     def __init__(
             self,
-            data_dir: str = "../../data/raw/stpls3d",
-            save_dir: str = "../../data/processed/stpls3d",
+            data_dir: str = "./data/las",
+            save_dir: str = "./data/processed/las",
             modes: tuple = ("train", "validation", "test"),
             n_jobs: int = -1
     ):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
-        # https://github.com/meidachen/STPLS3D/blob/main/HAIS/STPLS3DInstanceSegmentationChallenge_Codalab_Evaluate.py#L31
-        CLASS_LABELS = ['Build', 'LowVeg', 'MediumVeg', 'HighVeg', 'Vehicle', 'Truck', 'Aircraft', 'MilitaryVeh',
-                        'Bike', 'Motorcycle', 'LightPole', 'StreetSign', 'Clutter', 'Fence']
-        VALID_CLASS_IDS = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+        CLASS_LABELS = ["Other", "Trees"]
+        # the "Other" class contains trees that are cut off at the edge of the plot,
+        # as well as the ground
+        VALID_CLASS_IDS = np.array([1])  
 
+        # consider adding ground class
         self.class_map = {
-            'Ground': 0,
-            'Build': 1,
-            'LowVeg': 2,
-            'MediumVeg': 3,
-            'HighVeg': 4,
-            'Vehicle': 5,
-            'Truck': 6,
-            'Aircraft': 7,
-            'MilitaryVeh': 8,
-            'Bike': 9,
-            'Motorcycle': 10,
-            'LightPole': 11,
-            'StreetSign': 12,
-            'Clutter': 13,
-            'Fence': 14
+            "Other": 0,
+            "Trees": 1,
         }
 
         self.color_map = [
-            [0, 255, 0],     # Ground
-            [0, 0, 255],     # Build
-            [0, 255, 255],   # LowVeg
-            [255, 255, 0],   # MediumVeg
-            [255, 0, 255],   # HiVeg
-            [100, 100, 255], # Vehicle
-            [200, 200, 100], # Truck
-            [170, 120, 200], # Aircraft
-            [255, 0, 0],     # MilitaryVec
-            [200, 100, 100], # Bike
-            [10, 200, 100],  # Motorcycle
-            [200, 200, 200], # LightPole
-            [50, 50, 50],    # StreetSign
-            [60, 130, 60],   # Clutter
-            [130, 30, 60]]   # Fence
+            [0, 255, 0],   # Other
+            [0, 0, 255]]   # Trees
 
         self.create_label_database()
 
@@ -94,56 +70,102 @@ class STPLS3DPreprocessing(BasePreprocessing):
             "file_len": -1,
         }
 
-        points = pd.read_csv(filepath, header=None).values
+        with laspy.open(filepath) as fh:
+            las = fh.read()
+        
+        points = las.points.array
 
+        # following the stpls3d format
+        column_names = ["X", "Y", "Z", "red", "green", "blue", "treeSP", "treeID"]
+        points = points[column_names]
+        
+        points["treeSP"][points["treeSP"] > 1] = 1
+        
+        # rescale colours to between 0-255
+        points["red"] = ((points["red"] - points["red"].min()) * 
+                         (1/(points["red"].max() - points["red"].min()) * 255))
+        
+        points["green"] = ((points["green"] - points["green"].min()) * 
+                         (1/(points["green"].max() - points["green"].min()) * 255))
+        
+        points["blue"] = ((points["blue"] - points["blue"].min()) * 
+                         (1/(points["blue"].max() - points["blue"].min()) * 255))
+        
+        
+        
+        # this chunk of code converts the "void" type to float32
+        temp = np.expand_dims(points["X"].astype(np.float32), axis = 1)
+        for column in column_names[1:]:
+            temp = np.hstack((temp, np.expand_dims(points[column].astype(np.float32), axis = 1)))
+            
+        points = np.copy(temp)
+        temp = None
+        
+        points[:, 0] = ((points[:, 0] - points[:, 0].min()) * 
+                         (1/(points[:, 0].max() - points[:, 0].min()) * 490))
+        
+        points[:, 1] = ((points[:, 1] - points[:, 1].min()) * 
+                         (1/(points[:, 1].max() - points[:, 1].min()) * 490))
+        
+        points[:, 2] = ((points[:, 2] - points[:, 2].min()) * 
+                         (1/(points[:, 2].max() - points[:, 2].min()) * 490))
+        
+        """
+        # rescale X, Y, Z to be in the range (0, 490) as in stpls3d
+        # these are rescaled such that the dimensions are not stretched
+        
+        min_coord = np.amax(points[:, 0:3])
+        max_coord = np.amin(points[:, 0:3])
+        
+        points[:, 0] = ((points[:, 0] - min_coord) * 
+                         (1/(max_coord - min_coord) * 490))
+        
+        points[:, 1] = ((points[:, 1] - min_coord) * 
+                         (1/(max_coord - min_coord) * 490))
+        
+        points[:, 2] = ((points[:, 2] - min_coord) * 
+                         (1/(max_coord - min_coord) * 490))
+        """
+        
+        
         filebase["raw_segmentation_filepath"] = ""
 
         # add segment id as additional feature (DUMMY)
-        if mode in ["train", "validation"]:
-            points = np.hstack((points,
-                                np.ones(points.shape[0])[..., None],   # normal 1
-                                np.ones(points.shape[0])[..., None],   # normal 2
-                                np.ones(points.shape[0])[..., None],   # normal 3
-                                np.ones(points.shape[0])[..., None]))  # segments
-        else:
-            # we need to add dummies for semantics and instances
-            points = np.hstack((points,
-                                np.ones(points.shape[0])[..., None],   # semantic class
-                                np.ones(points.shape[0])[..., None],   # instance id
-                                np.ones(points.shape[0])[..., None],   # normal 1
-                                np.ones(points.shape[0])[..., None],   # normal 2
-                                np.ones(points.shape[0])[..., None],   # normal 3
-                                np.ones(points.shape[0])[..., None]))  # segments
+        points = np.hstack((points,
+                            np.ones(points.shape[0])[..., None],   # normal 1
+                            np.ones(points.shape[0])[..., None],   # normal 2
+                            np.ones(points.shape[0])[..., None],   # normal 3
+                            np.ones(points.shape[0])[..., None]))  # segments
+
 
         points = points[:, [0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 6, 7]]  # move segments after RGB
 
         # move point clouds to be in positive range (important for split pointcloud function)
         points[:, :3] = points[:, :3] - points[:, :3].min(0)
 
-        points = points.astype(np.float32)
-
         if mode == "test": 
             # drop the semantic class and instance id for testing
             points = points[:, :-2]
         else:
-            points[points[:, -1] == -100., -1] = -1  # in the instance id, -1 indicates "no instance"
+            points[points[:, -1] == 0., -1] = -1  # in the instance id, -1 indicates "no instance"
 
         file_len = len(points)
         filebase["file_len"] = file_len
 
-        processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.txt', '')}.npy"
+        processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.las', '')}.npy"
         if not processed_filepath.parent.exists():
             processed_filepath.parent.mkdir(parents=True, exist_ok=True)
         np.save(processed_filepath, points.astype(np.float32))
         filebase["filepath"] = str(processed_filepath)
 
         if mode in ["validation", "test"]:
-            blocks = self.splitPointCloud(points)
+            blocks = self.splitPointCloud(points, size=200.0, stride=200)
 
             filebase["instance_gt_filepath"] = []
             filebase["filepath_crop"] = []
+                
             for block_id, block in enumerate(blocks):
-                if len(block) > 10000:
+                if len(block) > 1000:
                     if mode == "validation":
                         new_instance_ids = np.unique(block[:, -1], return_inverse=True)[1]
 
@@ -154,13 +176,13 @@ class STPLS3DPreprocessing(BasePreprocessing):
 
                         gt_data = (block[:, -2]) * 1000 + new_instance_ids
 
-                        processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.txt', '')}_{block_id}.txt"
+                        processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.txt"
                         if not processed_gt_filepath.parent.exists():
                             processed_gt_filepath.parent.mkdir(parents=True, exist_ok=True)
                         np.savetxt(processed_gt_filepath, gt_data.astype(np.int32), fmt="%d")
                         filebase["instance_gt_filepath"].append(str(processed_gt_filepath))
 
-                    processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.txt', '')}_{block_id}.npy"
+                    processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.npy"
                     if not processed_filepath.parent.exists():
                         processed_filepath.parent.mkdir(parents=True, exist_ok=True)
                     np.save(processed_filepath, block.astype(np.float32))
@@ -222,4 +244,6 @@ class STPLS3DPreprocessing(BasePreprocessing):
 
 
 if __name__ == "__main__":
-    Fire(STPLS3DPreprocessing)
+   Fire(LASPreprocessing)
+
+
