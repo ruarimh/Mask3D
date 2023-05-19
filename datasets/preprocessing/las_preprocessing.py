@@ -15,7 +15,7 @@ class LASPreprocessing(BasePreprocessing):
             data_dir: str = "./data/las",
             save_dir: str = "./data/processed/las",
             modes: tuple = ("train", "validation", "test"),
-            n_jobs: int = -1
+            n_jobs: int = 1
     ):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
