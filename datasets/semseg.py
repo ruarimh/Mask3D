@@ -282,7 +282,7 @@ class SemanticSegmentationDataset(Dataset):
                 #new_data.append(np.load(self.data[i]["filepath"].replace("../../", "")))
             #self._data = new_data
 
-    def splitPointCloud(self, cloud, size=50.0, stride=50, inner_core=-1):
+    def splitPointCloud(self, cloud, size=250.0, stride=250, inner_core=-1):
         if inner_core == -1:
             limitMax = np.amax(cloud[:, 0:3], axis=0)
             width = int(np.ceil((limitMax[0] - size) / stride)) + 1
