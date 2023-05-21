@@ -21,10 +21,12 @@ class BasePreprocessing:
         save_dir: str = "./data/processed/",
         modes: tuple = ("train", "validation", "test"),
         n_jobs: int = -1,
+        sample_proportion: float = 1.0,
     ):
         self.data_dir = Path(data_dir)
         self.save_dir = Path(save_dir)
         self.n_jobs = n_jobs
+        self.sample_proportion = sample_proportion
         self.modes = modes
 
         if not self.data_dir.exists():
