@@ -15,7 +15,8 @@ class LASPreprocessing(BasePreprocessing):
             data_dir: str = "./data/las",
             save_dir: str = "./data/processed/las",
             modes: tuple = ("train", "validation", "test"),
-            n_jobs: int = 1
+            n_jobs: int = 1,
+            sample_proportion: float = 1.0
     ):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
@@ -74,6 +75,11 @@ class LASPreprocessing(BasePreprocessing):
             las = fh.read()
         
         points = las.points.array
+        
+        # subsample the array
+        points = points[np.random.choice(points.shape[0],
+                                         int(points.shape[0] * self.sample_proportion),
+                                         replace=False)]
 
         # following the stpls3d format
         column_names = ["X", "Y", "Z", "red", "green", "blue", "treeSP", "treeID"]
