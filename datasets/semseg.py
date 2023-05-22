@@ -266,6 +266,12 @@ class SemanticSegmentationDataset(Dataset):
                             block_outer = blocks_outer[block_id]
 
                             if cond_inner.sum() > 100:
+                                print("new_data", new_data)
+                                print("i", i)
+                                print("block_id", block_id)
+                                print("self._data[i]", self._data[i])
+                                print("self._data[i]['instance_gt_filepath']", self._data[i]['instance_gt_filepath'])
+                                print("self._data[i]['instance_gt_filepath'][block_id]", self._data[i]['instance_gt_filepath'][block_id])
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \
                                         if len(self._data[i]['instance_gt_filepath']) > 0 else list(),
