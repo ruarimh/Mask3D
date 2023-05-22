@@ -184,7 +184,7 @@ class LASPreprocessing(BasePreprocessing):
 
                         gt_data = (block[:, -2]) * 1000 + new_instance_ids
 
-                        processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.txt', '')}_{block_id}.txt"
+                        processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.txt"
                         if not processed_gt_filepath.parent.exists():
                             processed_gt_filepath.parent.mkdir(parents=True, exist_ok=True)
                         np.savetxt(processed_gt_filepath, gt_data.astype(np.int32), fmt="%d")
