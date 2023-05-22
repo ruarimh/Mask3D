@@ -171,7 +171,8 @@ class LASPreprocessing(BasePreprocessing):
             filebase["filepath_crop"] = []
                 
             for block_id, block in enumerate(blocks):
-                if len(block) > 1000:
+                print(len(blocks))
+                if len(block) > 100:
                     if mode == "validation":
                         new_instance_ids = np.unique(block[:, -1], return_inverse=True)[1]
 
