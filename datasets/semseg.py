@@ -246,7 +246,7 @@ class SemanticSegmentationDataset(Dataset):
                 if self.on_crops:
                     if self.eval_inner_core == -1:
                         for block_id, block in enumerate(self.splitPointCloud(self._data[i]['data'])):
-                            if len(block) > 1000:
+                            if len(block) > 100:
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \
                                         if len(self._data[i]['instance_gt_filepath']) > 0 else list(),
@@ -265,7 +265,7 @@ class SemanticSegmentationDataset(Dataset):
                             cond_inner = conds_inner[block_id]
                             block_outer = blocks_outer[block_id]
 
-                            if cond_inner.sum() > 10000:
+                            if cond_inner.sum() > 100:
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \
                                         if len(self._data[i]['instance_gt_filepath']) > 0 else list(),
@@ -282,7 +282,7 @@ class SemanticSegmentationDataset(Dataset):
                 #new_data.append(np.load(self.data[i]["filepath"].replace("../../", "")))
             #self._data = new_data
 
-    def splitPointCloud(self, cloud, size=250.0, stride=250, inner_core=-1):
+    def splitPointCloud(self, cloud, size=50.0, stride=50, inner_core=-1):
         if inner_core == -1:
             limitMax = np.amax(cloud[:, 0:3], axis=0)
             width = int(np.ceil((limitMax[0] - size) / stride)) + 1
