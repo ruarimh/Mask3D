@@ -413,6 +413,8 @@ class SemanticSegmentationDataset(Dataset):
                 if random() < 0.5:
                     coord_max = np.max(points[:, i])
                     coordinates[:, i] = coord_max - coordinates[:, i]
+                    
+                    print("Debug: coord_max")
 
             if random() < 0.95:
                 if self.is_elastic_distortion:
@@ -421,6 +423,8 @@ class SemanticSegmentationDataset(Dataset):
                             coordinates, granularity, magnitude
                         )
                     print("Debug: elastic distortion")
+                    
+            print("Debug: prior to volume augmentations")   
                     
             aug = self.volume_augmentations(
                 points=coordinates, normals=normals, features=color, labels=labels,
