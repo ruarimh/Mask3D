@@ -340,14 +340,12 @@ class SemanticSegmentationDataset(Dataset):
             return self.reps_per_epoch*len(self.data)
 
     def __getitem__(self, idx: int):
-        print("Debug: Start __getitem__")
         idx = idx % len(self.data)
         if self.is_tta:
             idx = idx % len(self.data)
 
         if self.cache_data:
             points = self.data[idx]['data']
-            print("Debug: self.cache_data")
         else:
             assert not self.on_crops, "you need caching if on crops"
             points = np.load(self.data[idx]["filepath"].replace("../../", ""))
@@ -355,7 +353,6 @@ class SemanticSegmentationDataset(Dataset):
         if "train" in self.mode and self.dataset_name in ["s3dis", "stpls3d", "las"]:
             inds = self.random_cuboid(points)
             points = points[inds]
-            print("Debug: training random cuboid setup")
 
         coordinates, color, normals, segments, labels = (
             points[:, :3],
@@ -387,7 +384,6 @@ class SemanticSegmentationDataset(Dataset):
                 normals = normals[new_idx]
                 points = points[new_idx]
                 
-                print("Debug: training random cuboid")
 
 
             coordinates -= coordinates.mean(0)
@@ -399,7 +395,6 @@ class SemanticSegmentationDataset(Dataset):
                 print(coordinates.shape)
                 raise err
                 
-            print("Debug: changing coordinates")
 
             if self.instance_oversampling > 0.0:
                 coordinates, color, normals, labels = self.augment_individual_instance(
@@ -414,7 +409,6 @@ class SemanticSegmentationDataset(Dataset):
                     coord_max = np.max(points[:, i])
                     coordinates[:, i] = coord_max - coordinates[:, i]
                     
-                    print("Debug: coord_max")
 
             if random() < 0.95:
                 if self.is_elastic_distortion:
@@ -422,14 +416,11 @@ class SemanticSegmentationDataset(Dataset):
                         coordinates = elastic_distortion(
                             coordinates, granularity, magnitude
                         )
-                    print("Debug: elastic distortion")
                     
-            print("Debug: prior to volume augmentations")   
                     
             aug = self.volume_augmentations(
                 points=coordinates, normals=normals, features=color, labels=labels,
             )
-            print("Debug: volume augmentations")
             
             coordinates, color, normals, labels = (
                 aug["points"],
@@ -440,7 +431,6 @@ class SemanticSegmentationDataset(Dataset):
             pseudo_image = color.astype(np.uint8)[np.newaxis, :, :]
             color = np.squeeze(self.image_augmentations(image=pseudo_image)["image"])
             
-            print("Debug: psuedo image")
 
             if self.point_per_cut != 0:
                 number_of_cuts = int(len(coordinates) / self.point_per_cut)
@@ -464,7 +454,6 @@ class SemanticSegmentationDataset(Dataset):
                         labels[~indexes],
                     )
                     
-                print("Debug: point_per_cut")
 
             # if self.noise_rate > 0:
             #     coordinates, color, normals, labels = random_points(
@@ -548,7 +537,6 @@ class SemanticSegmentationDataset(Dataset):
         # normalize color information
         pseudo_image = color.astype(np.uint8)[np.newaxis, :, :]
         color = np.squeeze(self.normalize_color(image=pseudo_image)["image"])
-        print("Debug: normalize color")
 
         # prepare labels and map from 0 to 20(40)
         labels = labels.astype(np.int32)
@@ -560,7 +548,6 @@ class SemanticSegmentationDataset(Dataset):
 
         labels = np.hstack((labels, segments[..., None].astype(np.int32)))
         
-        print("Debug: normalize labels")
 
         features = color
         if self.add_normals:
@@ -603,14 +590,12 @@ class SemanticSegmentationDataset(Dataset):
 
     @staticmethod
     def _load_yaml(filepath):
-        print("Debug: _load_yaml")
         with open(filepath) as f:
             # file = yaml.load(f, Loader=Loader)
             file = yaml.load(f)
         return file
 
     def _select_correct_labels(self, labels, num_labels):
-        print("Debug: _select_correct_labels")
         number_of_validation_labels = 0
         number_of_all_labels = 0
         for k, v, in labels.items():
@@ -632,7 +617,6 @@ class SemanticSegmentationDataset(Dataset):
             raise ValueError(msg)
 
     def _remap_from_zero(self, labels):
-        print("Debug: _remap_from_zero")
         labels[~np.isin(labels, list(self.label_info.keys()))] = self.ignore_label
         # remap to the range from 0
         for i, k in enumerate(self.label_info.keys()):
@@ -640,7 +624,6 @@ class SemanticSegmentationDataset(Dataset):
         return labels
 
     def _remap_model_output(self, output):
-        print("Debug: _remap_model_output")
         output = np.array(output)
         output_remapped = output.copy()
         for i, k in enumerate(self.label_info.keys()):
@@ -650,7 +633,6 @@ class SemanticSegmentationDataset(Dataset):
     def augment_individual_instance(
         self, coordinates, color, normals, labels, oversampling=1.0
     ):
-        print("Debug: augment_individual_instance")
         max_instance = int(len(np.unique(labels[:, 1])))
         # randomly selecting half of non-zero instances
         for instance in range(0, int(max_instance * oversampling)):
