@@ -35,7 +35,7 @@ train_dataset:
   eval_inner_core: ${general.eval_inner_core}
   filter_out_classes: [0]
   label_offset: 1
-  is_elastic_distortion: true
+  is_elastic_distortion: false
   color_drop: 0.0
 
 validation_dataset:
