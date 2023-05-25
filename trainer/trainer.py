@@ -417,6 +417,10 @@ class InstanceSegmentation(pl.LightningModule):
         if device is None:
             device = self.device
         labels = torch.arange(num_classes, device=device).unsqueeze(0).repeat(num_queries, 1).flatten(0, 1)
+        
+        print("debug: labels", labels)
+        print("debug: mask_cls.flatten(0, 1)", mask_cls.flatten(0, 1))
+        print("debug: self.config.general.topk_per_image", self.config.general.topk_per_image)
 
         if self.config.general.topk_per_image != -1 :
             scores_per_query, topk_indices = mask_cls.flatten(0, 1).topk(self.config.general.topk_per_image, sorted=True)
@@ -498,6 +502,12 @@ class InstanceSegmentation(pl.LightningModule):
                         len(new_preds['pred_logits']),
                         self.model.num_classes - 1)
                 else:
+                    
+                    print("debug: prediction[self.decoder_id]['pred_logits'][bid].detach().cpu()", prediction[self.decoder_id]['pred_logits'][bid].detach().cpu())
+                    print("debug: masks", masks)
+                    print("debug: prediction[self.decoder_id]['pred_logits'][bid].shape[0]", prediction[self.decoder_id]['pred_logits'][bid].shape[0])
+                    print("debug: self.model.num_classes - 1", self.model.num_classes - 1)
+                    
                     scores, masks, classes, heatmap = self.get_mask_and_scores(
                     prediction[self.decoder_id]['pred_logits'][bid].detach().cpu(),
                     masks,
