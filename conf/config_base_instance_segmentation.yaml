@@ -60,7 +60,7 @@ defaults:
   - model: mask3d
   - metrics: miou
   - optimizer: adamw
-  - scheduler: steplr
+  - scheduler: constantlr
   - trainer: trainer600
   - callbacks: callbacks_instance_segmentation
   - matcher: hungarian_matcher

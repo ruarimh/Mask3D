@@ -1,0 +1,8 @@
+# @package _group_
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ConstantLR
+  factor: 1.0
+
+pytorch_lightning_params:
+  interval: step
