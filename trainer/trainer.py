@@ -687,7 +687,7 @@ class InstanceSegmentation(pl.LightningModule):
                 elif self.validation_dataset.dataset_name == "las":
                     scan_id, _, crop_id = file_names[bid].split("_")
                     scan_id = crop_id.replace("plot", "")
-                    crop_id = int(crop_id.replace(".npy", ""))
+                    crop_id = int(crop_id.replace(".txt", ""))
                     file_name = f"{scan_id}_points_GTv3_0{crop_id}_inst_nostuff"
 
                     self.export(
