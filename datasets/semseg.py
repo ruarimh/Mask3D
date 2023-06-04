@@ -246,7 +246,7 @@ class SemanticSegmentationDataset(Dataset):
                 if self.on_crops:
                     if self.eval_inner_core == -1:
                         for block_id, block in enumerate(self.splitPointCloud(self._data[i]['data'])):
-                            if len(block) > 100:
+                            if len(block) > 10:
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \
                                         if len(self._data[i]['instance_gt_filepath']) > 0 else list(),
@@ -265,7 +265,7 @@ class SemanticSegmentationDataset(Dataset):
                             cond_inner = conds_inner[block_id]
                             block_outer = blocks_outer[block_id]
 
-                            if cond_inner.sum() > 100:
+                            if cond_inner.sum() > 10:
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \
                                         if len(self._data[i]['instance_gt_filepath']) > 0 else list(),
