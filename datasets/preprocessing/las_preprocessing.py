@@ -21,8 +21,7 @@ class LASPreprocessing(BasePreprocessing):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
         CLASS_LABELS = ["Other", "Trees"]
-        # the "Other" class contains trees that are cut off at the edge of the plot,
-        # as well as the ground
+        # the "Other" class contains the ground and low vegetation
         VALID_CLASS_IDS = np.array([1])  
 
         # consider adding ground class
@@ -77,15 +76,25 @@ class LASPreprocessing(BasePreprocessing):
         points = las.points.array
         
         # subsample the array
-        points = points[np.random.choice(points.shape[0],
-                                         int(points.shape[0] * self.sample_proportion),
-                                         replace=False)]
+        if self.sample_proportion < 1.0:
+            points = points[np.random.choice(points.shape[0],
+                                             int(points.shape[0] * self.sample_proportion),
+                                             replace=False)]
+            
+        
+        # remove points that are unannotated (0) or trees that were not labelled (3)
+        points = np.delete(points, 
+                           np.where(points["raw_classification"] == 0) | 
+                           np.where(points["raw_classification"] == 3), axis = 0)
 
         # following the stpls3d format
         column_names = ["X", "Y", "Z", "red", "green", "blue", "treeSP", "treeID"]
         points = points[column_names]
+    
         
+        # for now, all tree species are mapped to a single value 
         points["treeSP"][points["treeSP"] > 1] = 1
+    
         
         # rescale colours to between 0-255
         points["red"] = ((points["red"] - points["red"].min()) * 
