@@ -83,9 +83,10 @@ class LASPreprocessing(BasePreprocessing):
             
         
         # remove points that are unannotated (0) or trees that were not labelled (3)
-        points = np.delete(points, 
-                           np.where(points["raw_classification"] == 0) | 
-                           np.where(points["raw_classification"] == 3), axis = 0)
+        points = np.delete(points, np.where(
+            (points["raw_classification"] == 0)) | 
+            (points["raw_classification"] == 3),
+            axis = 0)
 
         # following the stpls3d format
         column_names = ["X", "Y", "Z", "red", "green", "blue", "treeSP", "treeID"]
