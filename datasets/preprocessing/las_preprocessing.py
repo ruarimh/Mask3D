@@ -177,7 +177,6 @@ class LASPreprocessing(BasePreprocessing):
         if mode in ["validation", "test"]:
             blocks = self.splitPointCloud(points, size=50.0, stride=50)
             
-            print("len(blocks)", len(blocks))
 
             filebase["instance_gt_filepath"] = []
             filebase["filepath_crop"] = []
