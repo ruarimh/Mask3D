@@ -177,7 +177,7 @@ class LASPreprocessing(BasePreprocessing):
             filebase["filepath_crop"] = []
                 
             for block_id, block in enumerate(blocks):
-                if len(block) > 1:
+                if len(block) > 10:
                     if mode == "validation":
                         new_instance_ids = np.unique(block[:, -1], return_inverse=True)[1]
 
@@ -200,7 +200,7 @@ class LASPreprocessing(BasePreprocessing):
                     np.save(processed_filepath, block.astype(np.float32))
                     filebase["filepath_crop"].append(str(processed_filepath))
                 else:
-                    print("block was smaller than 1 points")
+                    print("block was smaller than 10 points")
                     assert False
 
         filebase["color_mean"] = [
