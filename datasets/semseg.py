@@ -104,9 +104,7 @@ class SemanticSegmentationDataset(Dataset):
                 13:[60, 130, 60],  # Clutter
                 14:[130, 30, 60]}  # Fence
         elif self.dataset_name == "las":
-            self.color_map = [
-                [0, 255, 0],   # Other
-                [0, 0, 255]]   # Trees
+            self.color_map = [[0, 0, 255]]   # Trees
         elif self.dataset_name == "scannet200":
             self.color_map = SCANNET_COLOR_MAP_200
         elif self.dataset_name == "s3dis":

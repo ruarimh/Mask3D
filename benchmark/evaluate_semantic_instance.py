@@ -409,8 +409,8 @@ def evaluate(preds: dict, gt_path: str, output_file: str, dataset: str = "scanne
 
         opt['min_region_sizes'] = np.array([10])
 
-        CLASS_LABELS = ["Other", "Trees"]
-        VALID_CLASS_IDS = np.array([1])
+        CLASS_LABELS = ["Trees"]
+        VALID_CLASS_IDS = np.array([0])
 
         ID_TO_LABEL = {}
         LABEL_TO_ID = {}

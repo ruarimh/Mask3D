@@ -20,20 +20,16 @@ class LASPreprocessing(BasePreprocessing):
     ):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
-        CLASS_LABELS = ["Other", "Trees"]
-        # the "Other" class contains the ground and low vegetation
-        VALID_CLASS_IDS = np.array([1])  
+        CLASS_LABELS = ["Trees"]
+        VALID_CLASS_IDS = np.array([0])  
 
         # consider adding ground class
         self.class_map = {
-            "Other": 0,
-            "Trees": 1,
+            "Trees": 0,
         }
 
-        self.color_map = [
-            [0, 255, 0],   # Other
-            [0, 0, 255]]   # Trees
-
+        self.color_map = [[0, 0, 255]]   # Trees
+        
         self.create_label_database()
 
         for mode in self.modes:
