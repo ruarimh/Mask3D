@@ -230,6 +230,8 @@ class InstanceSegmentation(pl.LightningModule):
 
                 gt_pcd_normals.append(original_normals[mask_tmp.astype(bool), :])
 
+            print("debug: gt_pcd_pos", gt_pcd_pos)
+            
             gt_pcd_pos = np.concatenate(gt_pcd_pos)
             gt_pcd_normals = np.concatenate(gt_pcd_normals)
             gt_pcd_color = np.concatenate(gt_pcd_color)
