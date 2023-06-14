@@ -100,9 +100,9 @@ class LASPreprocessing(BasePreprocessing):
         
         if not self.use_rgb:
             # replace all colour values with 255.0
-            points["red"] = 255.0
-            points["green"] = 255.0
-            points["blue"] = 255.0
+            points["red"] = np.random.random(points["red"].size)
+            points["green"] = np.random.random(points["green"].size)
+            points["blue"] = np.random.random(points["blue"].size)
             
             
         else:
