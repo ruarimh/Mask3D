@@ -19,7 +19,7 @@ class LASPreprocessing(BasePreprocessing):
             sample_proportion: float = 1.0,
             use_rgb: bool = True
     ):
-        super().__init__(data_dir, save_dir, modes, n_jobs)
+        super().__init__(data_dir, save_dir, modes, n_jobs, sample_proportion, use_rgb)
 
         CLASS_LABELS = ["Other", "Trees"]
         # the "Other" class contains the ground and low vegetation
@@ -104,6 +104,7 @@ class LASPreprocessing(BasePreprocessing):
             points["green"] = 0
             points["blue"] = 0
             
+            
         else:
             # rescale colours to between 0-255
             points["red"] = ((points["red"] - points["red"].min()) * 
@@ -116,7 +117,6 @@ class LASPreprocessing(BasePreprocessing):
                              (1/(points["blue"].max() - points["blue"].min()) * 255))
         
         
-        
         # this chunk of code converts the "void" type to float32
         temp = np.expand_dims(points["X"].astype(np.float32), axis = 1)
         for column in column_names[1:]:
@@ -125,6 +125,7 @@ class LASPreprocessing(BasePreprocessing):
         points = np.copy(temp)
         temp = None
         
+        # rescale X, Y, Z to be in the range (0, 490) as in stpls3d
         points[:, 0] = ((points[:, 0] - points[:, 0].min()) * 
                          (1/(points[:, 0].max() - points[:, 0].min()) * 490))
         
@@ -134,22 +135,6 @@ class LASPreprocessing(BasePreprocessing):
         points[:, 2] = ((points[:, 2] - points[:, 2].min()) * 
                          (1/(points[:, 2].max() - points[:, 2].min()) * 490))
         
-        """
-        # rescale X, Y, Z to be in the range (0, 490) as in stpls3d
-        # these are rescaled such that the dimensions are not stretched
-        
-        min_coord = np.amax(points[:, 0:3])
-        max_coord = np.amin(points[:, 0:3])
-        
-        points[:, 0] = ((points[:, 0] - min_coord) * 
-                         (1/(max_coord - min_coord) * 490))
-        
-        points[:, 1] = ((points[:, 1] - min_coord) * 
-                         (1/(max_coord - min_coord) * 490))
-        
-        points[:, 2] = ((points[:, 2] - min_coord) * 
-                         (1/(max_coord - min_coord) * 490))
-        """
         
         
         filebase["raw_segmentation_filepath"] = ""
