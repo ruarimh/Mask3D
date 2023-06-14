@@ -105,17 +105,16 @@ class LASPreprocessing(BasePreprocessing):
             points["blue"] = np.random.random(points["blue"].size)
             
             
-        else:
-            # rescale colours to between 0-255
-            points["red"] = ((points["red"] - points["red"].min()) * 
-                             (1/(points["red"].max() - points["red"].min()) * 255))
-            
-            points["green"] = ((points["green"] - points["green"].min()) * 
-                             (1/(points["green"].max() - points["green"].min()) * 255))
-            
-            points["blue"] = ((points["blue"] - points["blue"].min()) * 
-                             (1/(points["blue"].max() - points["blue"].min()) * 255))
+        # rescale colours to between 0-255
+        points["red"] = ((points["red"] - points["red"].min()) * 
+                         (1/(points["red"].max() - points["red"].min()) * 255))
         
+        points["green"] = ((points["green"] - points["green"].min()) * 
+                         (1/(points["green"].max() - points["green"].min()) * 255))
+        
+        points["blue"] = ((points["blue"] - points["blue"].min()) * 
+                         (1/(points["blue"].max() - points["blue"].min()) * 255))
+    
         
         # this chunk of code converts the "void" type to float32
         temp = np.expand_dims(points["X"].astype(np.float32), axis = 1)
