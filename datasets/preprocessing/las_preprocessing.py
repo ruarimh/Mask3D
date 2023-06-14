@@ -107,10 +107,6 @@ class LASPreprocessing(BasePreprocessing):
             points["red"] += 1
             points["green"] += 1
             points["blue"] += 1
-            
-        print("debug: points[red].shape", points["red"].shape)
-        print("np.random.random((points[red].shape))", np.random.random((points["red"].shape)))
-        print("debug: points[red]", points["red"])
 
             
         # rescale colours to between 0-255
@@ -122,8 +118,6 @@ class LASPreprocessing(BasePreprocessing):
         
         points["blue"] = ((points["blue"] - points["blue"].min()) * 
                          (1/(points["blue"].max() - points["blue"].min()) * 255))
-        
-        print("debug: points[red]", points["red"])
     
         
         # this chunk of code converts the "void" type to float32
