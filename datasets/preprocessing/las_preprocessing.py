@@ -16,7 +16,8 @@ class LASPreprocessing(BasePreprocessing):
             save_dir: str = "./data/processed/las",
             modes: tuple = ("train", "validation", "test"),
             n_jobs: int = 1,
-            sample_proportion: float = 1.0
+            sample_proportion: float = 1.0,
+            use_rgb: bool = True
     ):
         super().__init__(data_dir, save_dir, modes, n_jobs)
 
@@ -95,17 +96,24 @@ class LASPreprocessing(BasePreprocessing):
         
         # for now, all tree species are mapped to a single value 
         points["treeSP"][points["treeSP"] > 1] = 1
-    
         
-        # rescale colours to between 0-255
-        points["red"] = ((points["red"] - points["red"].min()) * 
-                         (1/(points["red"].max() - points["red"].min()) * 255))
         
-        points["green"] = ((points["green"] - points["green"].min()) * 
-                         (1/(points["green"].max() - points["green"].min()) * 255))
-        
-        points["blue"] = ((points["blue"] - points["blue"].min()) * 
-                         (1/(points["blue"].max() - points["blue"].min()) * 255))
+        if not self.use_rgb:
+            # replace all colour values with 0
+            points["red"] = 0
+            points["green"] = 0
+            points["blue"] = 0
+            
+        else:
+            # rescale colours to between 0-255
+            points["red"] = ((points["red"] - points["red"].min()) * 
+                             (1/(points["red"].max() - points["red"].min()) * 255))
+            
+            points["green"] = ((points["green"] - points["green"].min()) * 
+                             (1/(points["green"].max() - points["green"].min()) * 255))
+            
+            points["blue"] = ((points["blue"] - points["blue"].min()) * 
+                             (1/(points["blue"].max() - points["blue"].min()) * 255))
         
         
         
