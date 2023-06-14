@@ -122,6 +122,8 @@ class LASPreprocessing(BasePreprocessing):
         
         points["blue"] = ((points["blue"] - points["blue"].min()) * 
                          (1/(points["blue"].max() - points["blue"].min()) * 255))
+        
+        print("debug: points[red]", points["red"])
     
         
         # this chunk of code converts the "void" type to float32
