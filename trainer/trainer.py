@@ -727,9 +727,20 @@ class InstanceSegmentation(pl.LightningModule):
         box_ap_25 = eval_det(self.bbox_preds, self.bbox_gt, ovthresh=0.25, use_07_metric=False)
         mean_box_ap_25 = sum([v for k, v in box_ap_25[-1].items()]) / len(box_ap_25[-1].keys())
         mean_box_ap_50 = sum([v for k, v in box_ap_50[-1].items()]) / len(box_ap_50[-1].keys())
+        
+        box_rec = eval_det(self.bbox_preds, self.bbox_gt, ovthresh=0.0, use_07_metric=False)
+        box_prec = eval_det(self.bbox_preds, self.bbox_gt, ovthresh=0.0, use_07_metric=False)
+        mean_box_rec = sum([v for k, v in box_rec[0].items()]) / len(box_rec[0].keys())
+        mean_box_prec = sum([v for k, v in box_prec[1].items()]) / len(box_prec[1].keys())
 
         ap_results[f"{log_prefix}_mean_box_ap_25"] = mean_box_ap_25
         ap_results[f"{log_prefix}_mean_box_ap_50"] = mean_box_ap_50
+        ap_results[f"{log_prefix}_mean_box_rec"] = mean_box_rec
+        ap_results[f"{log_prefix}_mean_box_prec"] = mean_box_prec
+        
+        
+        
+        
 
         for class_id in box_ap_50[-1].keys():
             class_name = self.train_dataset.label_info[class_id]['name']
@@ -738,6 +749,14 @@ class InstanceSegmentation(pl.LightningModule):
         for class_id in box_ap_25[-1].keys():
             class_name = self.train_dataset.label_info[class_id]['name']
             ap_results[f"{log_prefix}_{class_name}_val_box_ap_25"] = box_ap_25[-1][class_id]
+            
+        for class_id in box_rec[0].keys():
+            class_name = self.train_dataset.label_info[class_id]['name']
+            ap_results[f"{log_prefix}_{class_name}_val_box_rec"] = box_rec[0][class_id]
+            
+        for class_id in box_prec[1].keys():
+            class_name = self.train_dataset.label_info[class_id]['name']
+            ap_results[f"{log_prefix}_{class_name}_val_box_prec"] = box_prec[1][class_id]
 
         root_path = f"eval_output"
         base_path = f"{root_path}/instance_evaluation_{self.config.general.experiment_name}_{self.current_epoch}"

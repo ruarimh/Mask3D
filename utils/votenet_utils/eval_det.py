@@ -205,9 +205,13 @@ def eval_det(pred_all, gt_all, ovthresh=0.25, use_07_metric=False, get_iou_func=
     prec = {}
     ap = {}
     for classname in gt.keys():
-        print('Computing AP for class: ', classname)
+        print('AP for class: ', classname)
         rec[classname], prec[classname], ap[classname] = eval_det_cls(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func)
         print(classname, ap[classname])
+        print('Precision for class: ', classname)
+        print(classname, prec[classname])
+        print('Recall for class: ', classname)
+        print(classname, rec[classname])
     
     return rec, prec, ap 
 
