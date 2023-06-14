@@ -99,26 +99,25 @@ class LASPreprocessing(BasePreprocessing):
         
         
         if not self.use_rgb:
-            points["red"] = 255.0
-            points["green"] = 255.0
-            points["blue"] = 255.0
-            """
             # replace all colour values with 255.0
-            points["red"] = np.random.random(points["red"].size) + 1
-            points["green"] = np.random.random(points["green"].size) + 1
-            points["blue"] = np.random.random(points["blue"].size) + 1
-            """
+            points["red"] = np.random.random(points["red"].size)
+            points["green"] = np.random.random(points["green"].size)
+            points["blue"] = np.random.random(points["blue"].size)
             
-        else:
+            points["red"] += 1
+            points["green"] += 1
+            points["blue"] += 1
+
+            
         # rescale colours to between 0-255
-            points["red"] = ((points["red"] - points["red"].min()) * 
-                             (1/(points["red"].max() - points["red"].min()) * 255))
-            
-            points["green"] = ((points["green"] - points["green"].min()) * 
-                             (1/(points["green"].max() - points["green"].min()) * 255))
-            
-            points["blue"] = ((points["blue"] - points["blue"].min()) * 
-                             (1/(points["blue"].max() - points["blue"].min()) * 255))
+        points["red"] = ((points["red"] - points["red"].min()) * 
+                         (1/(points["red"].max() - points["red"].min()) * 255))
+        
+        points["green"] = ((points["green"] - points["green"].min()) * 
+                         (1/(points["green"].max() - points["green"].min()) * 255))
+        
+        points["blue"] = ((points["blue"] - points["blue"].min()) * 
+                         (1/(points["blue"].max() - points["blue"].min()) * 255))
     
         
         # this chunk of code converts the "void" type to float32
