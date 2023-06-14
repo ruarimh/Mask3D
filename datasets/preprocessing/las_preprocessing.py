@@ -107,6 +107,8 @@ class LASPreprocessing(BasePreprocessing):
             points["red"] += 1
             points["green"] += 1
             points["blue"] += 1
+            
+        print("debug: points[red]", points["red"])
 
             
         # rescale colours to between 0-255
