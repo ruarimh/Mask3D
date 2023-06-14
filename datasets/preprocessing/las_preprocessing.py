@@ -99,10 +99,10 @@ class LASPreprocessing(BasePreprocessing):
         
         
         if not self.use_rgb:
-            # replace all colour values with 0
-            points["red"] = 0
-            points["green"] = 0
-            points["blue"] = 0
+            # replace all colour values with 255.0
+            points["red"] = 255.0
+            points["green"] = 255.0
+            points["blue"] = 255.0
             
             
         else:
