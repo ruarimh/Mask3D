@@ -187,11 +187,30 @@ class InstanceSegmentation(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
         self.test_epoch_end(outputs)
+        
+    def save_visualizations_simple(self, target_full, full_res_coords,
+                            sorted_masks, sort_classes, file_name, original_colors, original_normals,
+                            sort_scores_values, point_size=20, sorted_heatmaps=None,
+                            query_pos=None, backbone_features=None):
+        
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_target_full", target_full)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_full_res_coords", full_res_coords)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_sort_classes", sort_classes)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_file_name", file_name)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_original_colors", original_colors)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_original_normals", original_normals)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_sort_scores_values", sort_scores_values)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_point_size", point_size)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_sorted_heatmaps", sorted_heatmaps)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_query_pos", query_pos)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_backbone_features", backbone_features)
+        np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_sorted_masks", sorted_masks)
 
     def save_visualizations(self, target_full, full_res_coords,
                             sorted_masks, sort_classes, file_name, original_colors, original_normals,
                             sort_scores_values, point_size=20, sorted_heatmaps=None,
                             query_pos=None, backbone_features=None):
+
 
         full_res_coords -= full_res_coords.mean(axis=0)
 
@@ -325,6 +344,8 @@ class InstanceSegmentation(pl.LightningModule):
 
         if not failed:
             v.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}")
+            
+
 
     def eval_step(self, batch, batch_idx):
         data, target, file_names = batch
@@ -653,7 +674,7 @@ class InstanceSegmentation(pl.LightningModule):
             if self.config.general.save_visualizations:
                 if 'cond_inner' in self.test_dataset.data[idx[bid]]:
                     target_full_res[bid]['masks'] = target_full_res[bid]['masks'][:, self.test_dataset.data[idx[bid]]['cond_inner']]
-                    self.save_visualizations(target_full_res[bid],
+                    self.save_visualizations_simple(target_full_res[bid],
                                              full_res_coords[bid][self.test_dataset.data[idx[bid]]['cond_inner']],
                                              [self.preds[file_names[bid]]['pred_masks']],
                                              [self.preds[file_names[bid]]['pred_classes']],
@@ -666,7 +687,7 @@ class InstanceSegmentation(pl.LightningModule):
                                              backbone_features=backbone_features[self.test_dataset.data[idx[bid]]['cond_inner']],
                                              point_size=self.config.general.visualization_point_size)
                 else:
-                    self.save_visualizations(target_full_res[bid],
+                    self.save_visualizations_simple(target_full_res[bid],
                                              full_res_coords[bid],
                                              [self.preds[file_names[bid]]['pred_masks']],
                                              [self.preds[file_names[bid]]['pred_classes']],
