@@ -193,6 +193,11 @@ class InstanceSegmentation(pl.LightningModule):
                             sort_scores_values, point_size=20, sorted_heatmaps=None,
                             query_pos=None, backbone_features=None):
         
+        isExist = os.path.exists(f"{self.config['general']['save_dir']}/visualizations/")
+        
+        if not isExist:
+            os.makedirs(f"{self.config['general']['save_dir']}/visualizations/")
+        
         np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_target_full", target_full)
         np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_full_res_coords", full_res_coords)
         np.save(f"{self.config['general']['save_dir']}/visualizations/{file_name}" + "_sort_classes", sort_classes)
