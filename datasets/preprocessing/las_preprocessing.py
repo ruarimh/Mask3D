@@ -198,23 +198,6 @@ class LASPreprocessing(BasePreprocessing):
                 else:
                     print("block was smaller than 10 points")
                     assert False
-            
-            if mode == "validation":
-                new_instance_ids = np.unique(points[:, -1], return_inverse=True)[1]
-                gt_data = (points[:, -2]) * 1000 + new_instance_ids
-                processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.las', '')}_101.txt"
-                if not processed_gt_filepath.parent.exists():
-                    processed_gt_filepath.parent.mkdir(parents=True, exist_ok=True)
-                np.savetxt(processed_gt_filepath, gt_data.astype(np.int32), fmt="%d")
-                filebase["instance_gt_filepath"].append(str(processed_gt_filepath))
-
-                processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.las', '')}_101.npy"
-                if not processed_filepath.parent.exists():
-                    processed_filepath.parent.mkdir(parents=True, exist_ok=True)
-                np.save(processed_filepath, points.astype(np.float32))
-                filebase["filepath_crop"].append(str(processed_filepath))
-            
-            processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.txt"
 
         filebase["color_mean"] = [
             float((points[:, 3] / 255).mean()),
