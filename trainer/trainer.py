@@ -677,33 +677,18 @@ class InstanceSegmentation(pl.LightningModule):
                 }
 
             if self.config.general.save_visualizations:
-                if 'cond_inner' in self.test_dataset.data[idx[bid]]:
-                    target_full_res[bid]['masks'] = target_full_res[bid]['masks'][:, self.test_dataset.data[idx[bid]]['cond_inner']]
-                    self.save_visualizations_simple(target_full_res[bid],
-                                             full_res_coords[bid][self.test_dataset.data[idx[bid]]['cond_inner']],
-                                             [self.preds[file_names[bid]]['pred_masks']],
-                                             [self.preds[file_names[bid]]['pred_classes']],
-                                             file_names[bid],
-                                             original_colors[bid][self.test_dataset.data[idx[bid]]['cond_inner']],
-                                             original_normals[bid][self.test_dataset.data[idx[bid]]['cond_inner']],
-                                             [self.preds[file_names[bid]]['pred_scores']],
-                                             sorted_heatmaps=[all_heatmaps[bid][self.test_dataset.data[idx[bid]]['cond_inner']]],
-                                             query_pos=all_query_pos[bid][self.test_dataset.data[idx[bid]]['cond_inner']] if len(all_query_pos) > 0 else None,
-                                             backbone_features=backbone_features[self.test_dataset.data[idx[bid]]['cond_inner']],
-                                             point_size=self.config.general.visualization_point_size)
-                else:
-                    self.save_visualizations_simple(target_full_res[bid],
-                                             full_res_coords[bid],
-                                             [self.preds[file_names[bid]]['pred_masks']],
-                                             [self.preds[file_names[bid]]['pred_classes']],
-                                             file_names[bid],
-                                             original_colors[bid],
-                                             original_normals[bid],
-                                             [self.preds[file_names[bid]]['pred_scores']],
-                                             sorted_heatmaps=[all_heatmaps[bid]],
-                                             query_pos=all_query_pos[bid] if len(all_query_pos) > 0 else None,
-                                             backbone_features=backbone_features,
-                                             point_size=self.config.general.visualization_point_size)
+                self.save_visualizations_simple(target_full_res[bid],
+                                         full_res_coords[bid],
+                                         [self.preds[file_names[bid]]['pred_masks']],
+                                         [self.preds[file_names[bid]]['pred_classes']],
+                                         file_names[bid],
+                                         original_colors[bid],
+                                         original_normals[bid],
+                                         [self.preds[file_names[bid]]['pred_scores']],
+                                         sorted_heatmaps=[all_heatmaps[bid]],
+                                         query_pos=all_query_pos[bid] if len(all_query_pos) > 0 else None,
+                                         backbone_features=backbone_features,
+                                         point_size=self.config.general.visualization_point_size)
 
             if self.config.general.export:
                 if self.validation_dataset.dataset_name == "stpls3d":
