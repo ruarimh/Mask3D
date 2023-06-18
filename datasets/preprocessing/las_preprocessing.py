@@ -188,7 +188,7 @@ class LASPreprocessing(BasePreprocessing):
                 np.save(processed_filepath, points.astype(np.float32))
                 filebase["filepath_crop"].append(str(processed_filepath))
                 
-                
+            """
             for block_id, block in enumerate(blocks):
                 if len(block) > 10:
                     if mode == "validation":
@@ -215,6 +215,7 @@ class LASPreprocessing(BasePreprocessing):
                 else:
                     print("block was smaller than 10 points")
                     assert False
+            """
 
         filebase["color_mean"] = [
             float((points[:, 3] / 255).mean()),
