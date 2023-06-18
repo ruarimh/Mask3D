@@ -479,7 +479,7 @@ def evaluate(preds: dict, gt_path: str, output_file: str, dataset: str = "scanne
     matches = {}
     for i,(k,v) in enumerate(preds.items()):
         if dataset == "las":
-            gt_file = os.path.join(gt_path, k)
+            gt_file = os.path.join(gt_path, k + ".txt")
         else:
             gt_file = os.path.join(gt_path, k + ".txt")
         if not os.path.isfile(gt_file):
