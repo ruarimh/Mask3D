@@ -22,7 +22,8 @@ class BasePreprocessing:
         modes: tuple = ("train", "validation", "test"),
         n_jobs: int = -1,
         sample_proportion: float = 1.0,
-        use_rgb: bool = True
+        use_rgb: bool = True,
+        full_validation_plots: bool = False,
     ):
         self.data_dir = Path(data_dir)
         self.save_dir = Path(save_dir)
@@ -30,6 +31,7 @@ class BasePreprocessing:
         self.sample_proportion = sample_proportion
         self.use_rgb = use_rgb
         self.modes = modes
+        self.full_validation_plots = full_validation_plots
 
         if not self.data_dir.exists():
             logger.error("data folder doesn't exist")

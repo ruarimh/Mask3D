@@ -17,9 +17,10 @@ class LASPreprocessing(BasePreprocessing):
             modes: tuple = ("train", "validation", "test"),
             n_jobs: int = 1,
             sample_proportion: float = 1.0,
-            use_rgb: bool = True
+            use_rgb: bool = True,
+            full_validation_plots: bool = False,
     ):
-        super().__init__(data_dir, save_dir, modes, n_jobs, sample_proportion, use_rgb)
+        super().__init__(data_dir, save_dir, modes, n_jobs, sample_proportion, use_rgb, full_validation_plots)
 
         CLASS_LABELS = ["Other", "Trees"]
         # the "Other" class contains the ground and low vegetation
@@ -166,13 +167,13 @@ class LASPreprocessing(BasePreprocessing):
         filebase["filepath"] = str(processed_filepath)
 
         if mode in ["validation", "test"]:
-            blocks = self.splitPointCloud(points, size=50.0, stride=50)
             
-
             filebase["instance_gt_filepath"] = []
             filebase["filepath_crop"] = []
             
-            if mode == "validation":
+            if mode == "validation" and self.full_validation_plots:
+                # if using full plots for inference
+                
                 new_instance_ids = np.unique(points[:, -1], return_inverse=True)[1]
                 gt_data = (points[:, -2]) * 1000 + new_instance_ids
 
@@ -188,34 +189,35 @@ class LASPreprocessing(BasePreprocessing):
                 np.save(processed_filepath, points.astype(np.float32))
                 filebase["filepath_crop"].append(str(processed_filepath))
                 
-            """
-            for block_id, block in enumerate(blocks):
-                if len(block) > 10:
-                    if mode == "validation":
-                        new_instance_ids = np.unique(block[:, -1], return_inverse=True)[1]
-
-                        assert new_instance_ids.shape[0] == block.shape[0]
-                        # == 0 means -1 == no instance
-                        # new_instance_ids[new_instance_ids == 0]
-                        assert new_instance_ids.max() < 1000, "we cannot encode when there are more than 999 instances in a block"
-
-                        gt_data = (block[:, -2]) * 1000 + new_instance_ids
-
-                        processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.txt"
-                        if not processed_gt_filepath.parent.exists():
-                            processed_gt_filepath.parent.mkdir(parents=True, exist_ok=True)
-                        np.savetxt(processed_gt_filepath, gt_data.astype(np.int32), fmt="%d")
-                        filebase["instance_gt_filepath"].append(str(processed_gt_filepath))
-
-                    processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.npy"
-                    if not processed_filepath.parent.exists():
-                        processed_filepath.parent.mkdir(parents=True, exist_ok=True)
-                    np.save(processed_filepath, block.astype(np.float32))
-                    filebase["filepath_crop"].append(str(processed_filepath))
-                else:
-                    print("block was smaller than 10 points")
-                    assert False
-            """
+            elif mode == "validation":
+                blocks = self.splitPointCloud(points, size=50.0, stride=50)
+                
+                for block_id, block in enumerate(blocks):
+                    if len(block) > 10:
+                        if mode == "validation":
+                            new_instance_ids = np.unique(block[:, -1], return_inverse=True)[1]
+    
+                            assert new_instance_ids.shape[0] == block.shape[0]
+                            # == 0 means -1 == no instance
+                            # new_instance_ids[new_instance_ids == 0]
+                            assert new_instance_ids.max() < 1000, "we cannot encode when there are more than 999 instances in a block"
+    
+                            gt_data = (block[:, -2]) * 1000 + new_instance_ids
+    
+                            processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.txt"
+                            if not processed_gt_filepath.parent.exists():
+                                processed_gt_filepath.parent.mkdir(parents=True, exist_ok=True)
+                            np.savetxt(processed_gt_filepath, gt_data.astype(np.int32), fmt="%d")
+                            filebase["instance_gt_filepath"].append(str(processed_gt_filepath))
+    
+                        processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.las', '')}_{block_id}.npy"
+                        if not processed_filepath.parent.exists():
+                            processed_filepath.parent.mkdir(parents=True, exist_ok=True)
+                        np.save(processed_filepath, block.astype(np.float32))
+                        filebase["filepath_crop"].append(str(processed_filepath))
+                    else:
+                        print("block was smaller than 10 points")
+                        assert False
 
         filebase["color_mean"] = [
             float((points[:, 3] / 255).mean()),
