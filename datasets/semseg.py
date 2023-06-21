@@ -253,8 +253,7 @@ class SemanticSegmentationDataset(Dataset):
                                                                               self.subplot_size,
                                                                               self.subplot_size)):
                             print("debug: block_id", block_id)
-                            print("debug: self._data[i]", self._data[i])
-                            print("debug: self._data", self._data)
+                            """
                             if len(block) > 10:
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \
@@ -265,6 +264,7 @@ class SemanticSegmentationDataset(Dataset):
                                 })
                             else:
                                 assert False
+                            """
                     else:
                         conds_inner, blocks_outer = self.splitPointCloud(self._data[i]['data'],
                                                                          size=self.crop_length,
