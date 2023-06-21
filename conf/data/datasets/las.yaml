@@ -29,6 +29,7 @@ train_dataset:
   is_tta: false
   crop_min_size: ${data.crop_min_size}
   crop_length: ${data.crop_length}
+  subplot_size: ${data.subplot_size}
   cropping_v1: ${data.cropping_v1}
   area: ${general.area}
   reps_per_epoch: ${general.reps_per_epoch}

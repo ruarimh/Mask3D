@@ -73,7 +73,8 @@ class SemanticSegmentationDataset(Dataset):
         label_offset=0,
         add_clip=False,
         is_elastic_distortion=True,
-        color_drop=0.0
+        color_drop=0.0,
+        subplot_size=50.0,
     ):
         assert task in ["instance_segmentation", "semantic_segmentation"], "unknown task"
 
@@ -245,7 +246,9 @@ class SemanticSegmentationDataset(Dataset):
                 self._data[i]['data'] = np.load(self.data[i]["filepath"].replace("../../", ""))
                 if self.on_crops:
                     if self.eval_inner_core == -1:
-                        for block_id, block in enumerate(self.splitPointCloud(self._data[i]['data'])):
+                        for block_id, block in enumerate(self.splitPointCloud(self._data[i]['data'],
+                                                                              self.subplot_size,
+                                                                              self.subplot_size)):
                             if len(block) > 10:
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \

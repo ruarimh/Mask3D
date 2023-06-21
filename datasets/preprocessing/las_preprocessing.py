@@ -19,8 +19,10 @@ class LASPreprocessing(BasePreprocessing):
             sample_proportion: float = 1.0,
             use_rgb: bool = True,
             full_validation_plots: bool = False,
+            subplot_size: float = 50.0,
     ):
-        super().__init__(data_dir, save_dir, modes, n_jobs, sample_proportion, use_rgb, full_validation_plots)
+        super().__init__(data_dir, save_dir, modes, n_jobs, sample_proportion, 
+                         use_rgb, full_validation_plots, subplot_size)
 
         CLASS_LABELS = ["Other", "Trees"]
         # the "Other" class contains the ground and low vegetation
@@ -190,7 +192,8 @@ class LASPreprocessing(BasePreprocessing):
                 filebase["filepath_crop"].append(str(processed_filepath))
                 
             elif mode == "validation":
-                blocks = self.splitPointCloud(points, size=50.0, stride=50)
+                blocks = self.splitPointCloud(points, size=self.subplot_size,
+                                              stride=self.subplot_size)
                 
                 for block_id, block in enumerate(blocks):
                     if len(block) > 10:
