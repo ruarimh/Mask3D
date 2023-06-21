@@ -253,6 +253,7 @@ class SemanticSegmentationDataset(Dataset):
                                                                               self.subplot_size,
                                                                               self.subplot_size)):
                             print("debug: block_id", block_id)
+                            print("debug: self.subplot_size", self.subplot_size)
                             """
                             if len(block) > 10:
                                 new_data.append({
