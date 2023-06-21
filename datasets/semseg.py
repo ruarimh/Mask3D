@@ -252,6 +252,9 @@ class SemanticSegmentationDataset(Dataset):
                         for block_id, block in enumerate(self.splitPointCloud(self._data[i]['data'],
                                                                               self.subplot_size,
                                                                               self.subplot_size)):
+                            print("debug: block_id", block_id)
+                            print("debug: self._data[i].size()", self._data[i].size())
+                            print("debug: self._data.size()", self._data.size())
                             if len(block) > 10:
                                 new_data.append({
                                     'instance_gt_filepath': self._data[i]['instance_gt_filepath'][block_id] \
