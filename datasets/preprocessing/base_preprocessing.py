@@ -24,6 +24,7 @@ class BasePreprocessing:
         sample_proportion: float = 1.0,
         use_rgb: bool = True,
         full_validation_plots: bool = False,
+        crop_length: float = 50.0,
     ):
         self.data_dir = Path(data_dir)
         self.save_dir = Path(save_dir)
@@ -32,6 +33,8 @@ class BasePreprocessing:
         self.use_rgb = use_rgb
         self.modes = modes
         self.full_validation_plots = full_validation_plots
+        self.crop_length = crop_length
+
 
         if not self.data_dir.exists():
             logger.error("data folder doesn't exist")
