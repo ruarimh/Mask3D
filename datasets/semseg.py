@@ -75,6 +75,7 @@ class SemanticSegmentationDataset(Dataset):
         is_elastic_distortion=True,
         color_drop=0.0,
         subplot_size=50.0,
+        full_validation_plots=False,
     ):
         assert task in ["instance_segmentation", "semantic_segmentation"], "unknown task"
 
@@ -174,6 +175,8 @@ class SemanticSegmentationDataset(Dataset):
         self.flip_in_center = flip_in_center
         self.noise_rate = noise_rate
         self.resample_points = resample_points
+        self.subplot_size = subplot_size
+        self.full_validation_plots = full_validation_plots
 
         # loading database files
         self._data = []
