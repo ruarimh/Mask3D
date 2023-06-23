@@ -23,7 +23,6 @@ class BasePreprocessing:
         n_jobs: int = -1,
         sample_proportion: float = 1.0,
         use_rgb: bool = True,
-        full_validation_plots: bool = False,
         subplot_size: float = 50.0,
     ):
         self.data_dir = Path(data_dir)
@@ -32,7 +31,6 @@ class BasePreprocessing:
         self.sample_proportion = sample_proportion
         self.use_rgb = use_rgb
         self.modes = modes
-        self.full_validation_plots = full_validation_plots
         self.subplot_size = subplot_size
 
         if not self.data_dir.exists():

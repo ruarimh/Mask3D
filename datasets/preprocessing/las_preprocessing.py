@@ -18,11 +18,23 @@ class LASPreprocessing(BasePreprocessing):
             n_jobs: int = 1,
             sample_proportion: float = 1.0,
             use_rgb: bool = True,
-            full_validation_plots: bool = False,
             subplot_size: float = 50.0,
     ):
+        
+        """
+        Args:
+            data_dir (str): Directory containing the train, validationm and test directories which contain .las files.
+            save_dir (str): Directory to save the processed data.
+            modes (tuple): Modes to process ("train", "validation", "test").
+            n_jobs (int): Number of parallel jobs for processing.
+            sample_proportion (float): Proportion of points to sample.
+            use_rgb (bool): Whether to use RGB values.
+            subplot_size (float): Size of subplots for validation mode.
+
+        """
+        
         super().__init__(data_dir, save_dir, modes, n_jobs, sample_proportion, 
-                         use_rgb, full_validation_plots, subplot_size)
+                         use_rgb, subplot_size)
 
         CLASS_LABELS = ["Other", "Trees"]
         # the "Other" class contains the ground and low vegetation
@@ -172,26 +184,8 @@ class LASPreprocessing(BasePreprocessing):
             
             filebase["instance_gt_filepath"] = []
             filebase["filepath_crop"] = []
-            
-            if mode == "validation" and self.full_validation_plots:
-                # if using full plots for inference
                 
-                new_instance_ids = np.unique(points[:, -1], return_inverse=True)[1]
-                gt_data = (points[:, -2]) * 1000 + new_instance_ids
-
-                processed_gt_filepath = self.save_dir / "instance_gt" / mode / f"{filebase['scene'].replace('.las', '')}.txt"
-                if not processed_gt_filepath.parent.exists():
-                    processed_gt_filepath.parent.mkdir(parents=True, exist_ok=True)
-                np.savetxt(processed_gt_filepath, gt_data.astype(np.int32), fmt="%d")
-                filebase["instance_gt_filepath"].append(str(processed_gt_filepath))
-
-                processed_filepath = self.save_dir / mode / f"{filebase['scene'].replace('.las', '')}.npy"
-                if not processed_filepath.parent.exists():
-                    processed_filepath.parent.mkdir(parents=True, exist_ok=True)
-                np.save(processed_filepath, points.astype(np.float32))
-                filebase["filepath_crop"].append(str(processed_filepath))
-                
-            elif mode == "validation":
+            if mode == "validation":
                 blocks = self.splitPointCloud(points, size=self.subplot_size,
                                               stride=self.subplot_size)
                 

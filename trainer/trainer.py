@@ -61,7 +61,6 @@ class InstanceSegmentation(pl.LightningModule):
             self.optional_freeze = torch.no_grad
         # loss
         self.ignore_label = config.data.ignore_label
-        self.full_validation_plots = config.data.full_validation_plots
 
         matcher = hydra.utils.instantiate(config.matcher)
         weight_dict = {"loss_ce": matcher.cost_class,
@@ -775,8 +774,7 @@ class InstanceSegmentation(pl.LightningModule):
                         'pred_masks': self.preds[key]['pred_masks'],
                         'pred_scores': self.preds[key]['pred_scores']
                     }
-                mprec, mrec = evaluate(new_preds, gt_data_path, pred_path, dataset="s3dis",
-                                       full_validation_plots = self.full_validation_plots)
+                mprec, mrec = evaluate(new_preds, gt_data_path, pred_path, dataset="s3dis")
                 ap_results[f"{log_prefix}_mean_precision"] = mprec
                 ap_results[f"{log_prefix}_mean_recall"] = mrec
             
@@ -789,8 +787,7 @@ class InstanceSegmentation(pl.LightningModule):
                         'pred_scores': self.preds[key]['pred_scores']
                     }
 
-                evaluate(new_preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name,
-                         full_validation_plots = self.full_validation_plots)
+                evaluate(new_preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name)
                 
             elif self.validation_dataset.dataset_name in ["las"]:
                 new_preds = {}
@@ -801,12 +798,10 @@ class InstanceSegmentation(pl.LightningModule):
                         'pred_scores': self.preds[key]['pred_scores']
                     }
 
-                evaluate(new_preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name,
-                         full_validation_plots = self.full_validation_plots)
+                evaluate(new_preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name)
                 
             else:
-                evaluate(self.preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name,
-                         full_validation_plots = self.full_validation_plots)
+                evaluate(self.preds, gt_data_path, pred_path, dataset=self.validation_dataset.dataset_name)
             with open(pred_path, "r") as fin:
                 for line_id, line in enumerate(fin):
                     if line_id == 0:

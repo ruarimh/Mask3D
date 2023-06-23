@@ -30,7 +30,6 @@ train_dataset:
   crop_min_size: ${data.crop_min_size}
   crop_length: ${data.crop_length}
   subplot_size: ${data.subplot_size}
-  full_validation_plots: ${data.full_validation_plots}
   cropping_v1: ${data.cropping_v1}
   area: ${general.area}
   reps_per_epoch: ${general.reps_per_epoch}
@@ -63,7 +62,6 @@ validation_dataset:
   crop_length: ${data.crop_length}
   cropping_v1: ${data.cropping_v1}
   subplot_size: ${data.subplot_size}
-  full_validation_plots: ${data.full_validation_plots}
   area: ${general.area}
   on_crops: ${general.on_crops}
   eval_inner_core: ${general.eval_inner_core}
@@ -92,7 +90,6 @@ test_dataset:
   crop_min_size: ${data.crop_min_size}
   crop_length: ${data.crop_length}
   subplot_size: ${data.subplot_size}
-  full_validation_plots: ${data.full_validation_plots}
   cropping_v1: ${data.cropping_v1}
   area: ${general.area}
   on_crops: ${general.on_crops}

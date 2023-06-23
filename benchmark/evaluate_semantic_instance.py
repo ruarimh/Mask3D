@@ -376,7 +376,7 @@ def write_result_file(avgs, filename):
             f.write(_SPLITTER.join([str(x) for x in [class_name, class_id, ap, ap50, ap25]]) + '\n')
 
 
-def evaluate(preds: dict, gt_path: str, output_file: str, dataset: str = "scannet", full_validation_plots: bool = False):
+def evaluate(preds: dict, gt_path: str, output_file: str, dataset: str = "scannet"):
     global CLASS_LABELS
     global VALID_CLASS_IDS
     global ID_TO_LABEL
@@ -479,9 +479,6 @@ def evaluate(preds: dict, gt_path: str, output_file: str, dataset: str = "scanne
     matches = {}
     for i,(k,v) in enumerate(preds.items()):
         if dataset == "las":
-            if full_validation_plots:
-                gt_file = os.path.join(gt_path, k + ".txt")
-            else:
                 gt_file = os.path.join(gt_path, k)
         else:
             gt_file = os.path.join(gt_path, k + ".txt")
