@@ -2,7 +2,7 @@
 We use the Mask3D Transformer architecture to extract individual trees from drone LiDAR data.
 
 ### Notebooks
-Notebooks for training and visualizations are found in the /notebooks folder. This model can be trained on the free GPU version of Google Colab.
+Notebooks for training and visualizations are found in the /notebooks folder. The training notebook also shows how to prepare the .las files to be used by the preprocessing script. This model can be trained on the free GPU version of Google Colab.
 
 ### Data
 We use the FORinstance NIBIO2 dataset (A new UAV laser scanning benchmark dataset for characterization of single-tree and forest biophysical properties, Stefano Puliti).
